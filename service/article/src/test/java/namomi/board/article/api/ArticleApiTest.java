@@ -7,7 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import namomi.board.article.service.response.ArticlePageResponse;
 import namomi.board.article.service.response.ArticleResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Slf4j
 public class ArticleApiTest {
@@ -75,6 +78,33 @@ public class ArticleApiTest {
         for (ArticleResponse article : response.getArticles()) {
             log.info("article: {}", article);
         }
+    }
+
+    @Test
+    void readAllInfiniteScrollTest() {
+        List<ArticleResponse> articles1 = restClient.get()
+                .uri("/v1/articles/infinite-scroll?boardId=1&pageSize=5")
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ArticleResponse>>() {
+                });
+
+        log.info("firestPage");
+        for (ArticleResponse articleResponse : articles1) {
+            log.info("articleResponse.getArticleId(): {}", articleResponse.getArticleId());
+        }
+
+        Long lastArticleId = articles1.getLast().getArticleId();
+        List<ArticleResponse> articles2 = restClient.get()
+                .uri("/v1/articles/infinite-scroll?boardId=1&pageSize=5&lastArticleId=%s".formatted(lastArticleId))
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ArticleResponse>>() {
+                });
+
+        log.info("secondPage");
+        for (ArticleResponse articleResponse : articles2) {
+            log.info("articleResponse.getArticleId(): {}", articleResponse.getArticleId());
+        }
+
     }
 
     @Getter
