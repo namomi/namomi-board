@@ -1,9 +1,7 @@
 package namomi.board.comment.controller;
 
 import lombok.RequiredArgsConstructor;
-import namomi.board.comment.service.CommentService;
 import namomi.board.comment.service.CommentServiceV2;
-import namomi.board.comment.service.request.CommentCreateRequest;
 import namomi.board.comment.service.request.CommentCreateRequestV2;
 import namomi.board.comment.service.response.CommentPageResponse;
 import namomi.board.comment.service.response.CommentResponse;
@@ -46,5 +44,10 @@ public class CommentControllerV2 {
             @RequestParam(value = "lastPath", required = false) String lastPath,
             @RequestParam("pageSize") Long pageSize) {
         return commentService.readAllInfiniteScroll(articleId, lastPath, pageSize);
+    }
+
+    @GetMapping("/v2/comments/articles/{articleId}/count")
+    public Long count(@PathVariable("articleId") Long articleId) {
+        return commentService.count(articleId);
     }
 }
